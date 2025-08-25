@@ -51,18 +51,31 @@ export default function TutorPage() {
       return;
     }
     const recognition = new SpeechRecognition();
-    recognition.continuous = false;
+    recognition.continuous = true; // Keep listening even after a pause
     recognition.lang = 'es-ES';
-    recognition.interimResults = false;
+    recognition.interimResults = true; // Get results as they come in
 
     recognition.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(transcript);
-      handleSendMessage(transcript);
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+        setInput(finalTranscript + interimTranscript);
+        if(finalTranscript.trim()){
+            handleSendMessage(finalTranscript.trim());
+            recognitionRef.current?.stop();
+        }
     };
 
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
+      setIsRecording(false);
     };
     
     recognition.onend = () => {
@@ -75,8 +88,8 @@ export default function TutorPage() {
   const toggleRecording = () => {
       if (isRecording) {
           recognitionRef.current?.stop();
-          setIsRecording(false);
       } else {
+          setInput('');
           recognitionRef.current?.start();
           setIsRecording(true);
       }
@@ -104,7 +117,7 @@ export default function TutorPage() {
   };
 
   const handleSendMessage = async (text: string) => {
-    if (!text.trim()) return;
+    if (!text.trim() || isLoading) return;
 
     const userMessageId = new Date().toISOString();
     const userMessage: Message = { id: userMessageId, text, isUser: true };
@@ -162,7 +175,7 @@ export default function TutorPage() {
                 {messages.length === 0 && (
                     <div className="text-center text-muted-foreground p-8">
                         <MessageSquare size={48} className="mx-auto mb-4" />
-                        <p>Aún no hay mensajes. ¡Di "hola" para empezar!</p>
+                        <p>Aún no hay mensajes. ¡Pulsa el micrófono y di "hola" para empezar!</p>
                     </div>
                 )}
               {messages.map((message) => (
@@ -199,7 +212,7 @@ export default function TutorPage() {
                    )}
                 </div>
               ))}
-               {isLoading && (
+               {isLoading && !isRecording && (
                   <div className="flex items-start gap-3 justify-start">
                      <Avatar className="h-8 w-8">
                       <AvatarImage src="/profemar-avatar.png" alt="Profemar" data-ai-hint="teacher robot"/>
@@ -223,9 +236,9 @@ export default function TutorPage() {
               />
                <Button type="button" variant={isRecording ? "destructive" : "outline"} size="icon" onClick={toggleRecording} disabled={!SpeechRecognition || isLoading} title="Usar micrófono">
                 {isRecording ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                <span className="sr-only">{isRecording ? "Dejar de grabar" : "Usar micrófono"}</span>
+                <span className="sr-only">{isRecording ? "Dejar de grabar" : "Grabar voz"}</span>
               </Button>
-              <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+              <Button type="submit" size="icon" disabled={isLoading || isRecording || !input.trim()}>
                 <Send className="h-5 w-5" />
                 <span className="sr-only">Enviar</span>
               </Button>
