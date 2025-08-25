@@ -42,9 +42,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          setUserLevel(userDoc.data().level || null);
+        try {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+              setUserLevel(userDoc.data().level || null);
+            }
+        } catch (error) {
+            console.error("Error fetching user level:", error);
+            setUserLevel(null);
         }
       } else {
         setUserLevel(null);
