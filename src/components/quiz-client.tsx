@@ -32,7 +32,7 @@ export function QuizClient() {
         const data = await generateQuizQuestions({
           topic: "general spanish proficiency",
           proficiencyLevel: "A1-C2",
-          numberOfQuestions: 10,
+          numberOfQuestions: 15,
         });
         setQuestions(data.questions);
         setQuizState("ongoing");

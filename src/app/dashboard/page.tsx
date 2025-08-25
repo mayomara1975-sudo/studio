@@ -38,7 +38,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline">¡Hola, bienvenido a ProfeAI!</h1>
+        <h1 className="text-3xl font-bold font-headline">¡Hola, bienvenido a Profemar!</h1>
         <p className="text-muted-foreground">Aquí tienes un resumen de tu progreso y las actividades disponibles.</p>
       </div>
 

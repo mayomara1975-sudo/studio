@@ -18,7 +18,7 @@ export type CorrectUserTextInput = z.infer<typeof CorrectUserTextInputSchema>;
 
 const CorrectUserTextOutputSchema = z.object({
   correctedText: z.string().describe('The corrected text with grammar and style improvements.'),
-  feedback: z.string().describe('AI-generated feedback and corrections for the user text.'),
+  feedback: z.string().describe('Detailed, constructive feedback explaining the corrections made and suggesting areas for improvement.'),
 });
 export type CorrectUserTextOutput = z.infer<typeof CorrectUserTextOutputSchema>;
 
@@ -30,11 +30,12 @@ const prompt = ai.definePrompt({
   name: 'correctUserTextPrompt',
   input: {schema: CorrectUserTextInputSchema},
   output: {schema: CorrectUserTextOutputSchema},
-  prompt: `You are an AI-powered grammar and style correction tool. Please correct the following text and provide feedback.
+  prompt: `You are an AI-powered Spanish language tutor. Correct the following text for grammar, spelling, and style. Provide clear, constructive feedback explaining the reasons for your corrections.
 
-Text: {{{text}}}
+Text to correct:
+{{{text}}}
 
-Corrected Text:`,
+Respond with the corrected text and detailed feedback.`,
 });
 
 const correctUserTextFlow = ai.defineFlow(

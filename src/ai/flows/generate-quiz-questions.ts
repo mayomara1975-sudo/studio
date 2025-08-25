@@ -33,7 +33,7 @@ const GenerateQuizQuestionsOutputSchema = z.object({
       question: z.string().describe('The quiz question.'),
       answer: z.string().describe('The correct answer to the question.'),
       options: z.array(z.string()).describe('The possible answer options.'),
-      feedback: z.string().describe('AI feedback for the user response.'),
+      feedback: z.string().describe('Brief, encouraging feedback for the user response.'),
     })
   ),
 });
@@ -47,13 +47,21 @@ const prompt = ai.definePrompt({
   name: 'generateQuizQuestionsPrompt',
   input: {schema: GenerateQuizQuestionsInputSchema},
   output: {schema: GenerateQuizQuestionsOutputSchema},
-  prompt: `You are an AI quiz generator that generates quizzes based on a given topic and proficiency level.  The user will specify a topic and proficiency level, and you will generate a quiz with multiple choice questions. Each question should have a question, answer, possible options and feedback.
+  prompt: `You are an AI quiz generator specializing in Spanish language learning. Create a set of multiple-choice questions to assess a user's proficiency. The questions should cover a range of difficulties from A1 (beginner) to C2 (proficient) to accurately determine their level.
+
+Ensure the questions test various aspects of the language, including grammar (verb tenses, ser vs. estar, prepositions), vocabulary, and reading comprehension.
 
 Topic: {{{topic}}}
-Proficiency Level: {{{proficiencyLevel}}}
+Target Proficiency Range: {{{proficiencyLevel}}}
 Number of Questions: {{{numberOfQuestions}}}
 
-Output the quiz in JSON format.`,
+For each question, provide:
+1. The question text.
+2. The correct answer.
+3. Plausible incorrect options.
+4. Brief, encouraging feedback for when a user selects an answer.
+
+Generate the quiz in JSON format.`,
 });
 
 const generateQuizQuestionsFlow = ai.defineFlow(

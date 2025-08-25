@@ -14,7 +14,7 @@ import {z} from 'genkit';
 const AnalyzeProficiencyLevelInputSchema = z.object({
   quizResponses: z
     .string()
-    .describe('A string containing the user\'s quiz responses.'),
+    .describe('A string containing the user\'s quiz responses, with each question and answer pair separated.'),
 });
 export type AnalyzeProficiencyLevelInput = z.infer<
   typeof AnalyzeProficiencyLevelInputSchema
@@ -29,7 +29,7 @@ const AnalyzeProficiencyLevelOutputSchema = z.object({
   reasoning: z
     .string()
     .describe(
-      'The AI reasoning behind the assessed proficiency level, explaining why the user was assigned that level.'
+      'The AI reasoning behind the assessed proficiency level, explaining why the user was assigned that level based on their performance.'
     ),
 });
 export type AnalyzeProficiencyLevelOutput = z.infer<
@@ -48,11 +48,12 @@ const prompt = ai.definePrompt({
   output: {schema: AnalyzeProficiencyLevelOutputSchema},
   prompt: `You are an expert language proficiency assessor.
 
-You will analyze the user's quiz responses and determine their language proficiency level according to the Common European Framework of Reference for Languages (CEFR) levels (A1, A2, B1, B2, C1, C2).
+You will analyze the user's quiz responses to determine their language proficiency level according to the Common European Framework of Reference for Languages (CEFR). The levels are A1, A2, B1, B2, C1, and C2.
 
-Based on the responses, determine the user's proficiency level and provide a brief explanation of your reasoning.
+Analyze the user's answers, considering grammar, vocabulary, and comprehension. Based on their performance, determine the most appropriate proficiency level and provide a concise, clear explanation for your assessment.
 
-Quiz Responses: {{{quizResponses}}}
+Quiz Responses:
+{{{quizResponses}}}
 `,
 });
 
