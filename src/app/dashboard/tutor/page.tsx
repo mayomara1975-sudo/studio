@@ -19,7 +19,6 @@ interface Message {
   id: string;
   text: string;
   isUser: boolean;
-  feedback?: ProvideAutomatedFeedbackOutput;
   audioUrl?: string;
   isPlaying?: boolean;
 }
@@ -120,13 +119,12 @@ export default function TutorPage() {
         level: userLevel || 'A1',
       });
       
-      const aiMessageText = feedbackResult.correctedAnswer || "¡Entendido! Sigue practicando.";
+      const aiMessageText = feedbackResult.correctedAnswer || "No he entendido bien, ¿puedes repetirlo?";
       const aiMessageId = new Date().toISOString() + 'ai';
       const aiMessage: Message = {
         id: aiMessageId,
         text: aiMessageText,
         isUser: false,
-        feedback: feedbackResult
       };
       setMessages((prev) => [...prev, aiMessage]);
 
@@ -189,16 +187,6 @@ export default function TutorPage() {
                                 {message.isPlaying ? <PauseCircle className="mr-2"/> : <PlayCircle className="mr-2"/>}
                                 {message.isPlaying ? 'Pausar' : 'Escuchar'}
                             </Button>
-                        )}
-                        {message.feedback?.feedback && message.feedback.feedback !== message.text && (
-                           <Card className="mt-2 bg-background/50 text-sm">
-                            <CardHeader className="p-2">
-                            <CardTitle className="text-xs font-headline">Sugerencia</CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-2 text-xs">
-                            <p className="whitespace-pre-wrap">{message.feedback.feedback}</p>
-                            </CardContent>
-                           </Card>
                         )}
                         </div>
                     )}

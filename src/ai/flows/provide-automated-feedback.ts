@@ -41,17 +41,25 @@ const prompt = ai.definePrompt({
   name: 'provideAutomatedFeedbackPrompt',
   input: {schema: ProvideAutomatedFeedbackInputSchema},
   output: {schema: ProvideAutomatedFeedbackOutputSchema},
-  prompt: `You are an AI language tutor providing feedback to a student. The student is at level {{{level}}}. Your response MUST be in Spanish.
+  prompt: `You are an AI language tutor. Your response MUST be in Spanish.
 
-  Question: {{{question}}}
-  Answer: {{{answer}}}
+{{#ifCond question '==' 'Conversación abierta'}}
+You are acting as a conversational chatbot. The user wants to practice their Spanish. Engage in a natural conversation with them.
+User's message: {{{answer}}}
+Respond naturally to continue the conversation.
+{{else}}
+You are providing feedback to a student. The student is at level {{{level}}}.
 
-  Provide extensive and detailed feedback to the student, highlighting any errors and suggesting improvements. If the answer contains errors, provide a corrected answer as well.
-  Be encouraging but thorough.
-  Speak directly to the student in Spanish.
-  Do not refer to yourself as an AI.
-  Feedback:
-  `,
+Question: {{{question}}}
+Answer: {{{answer}}}
+
+Provide extensive and detailed feedback to the student, highlighting any errors and suggesting improvements. If the answer contains errors, provide a corrected answer as well.
+Be encouraging but thorough.
+Speak directly to the student in Spanish.
+Do not refer to yourself as an AI.
+Feedback:
+{{/ifCond}}
+`,
 });
 
 const provideAutomatedFeedbackFlow = ai.defineFlow(
@@ -62,6 +70,15 @@ const provideAutomatedFeedbackFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    
+    // If it's open conversation, the corrected answer is the AI's response text.
+    if (input.question === 'Conversación abierta' && output) {
+        return {
+            correctedAnswer: output.correctedText,
+            feedback: output.feedback
+        };
+    }
+    
     return output!;
   }
 );
