@@ -14,12 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock login
+    // Mock register
     router.push("/dashboard");
   };
 
@@ -30,16 +30,18 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-2xl font-headline">
-            Bienvenido de nuevo
-          </CardTitle>
+          <CardTitle className="text-2xl font-headline">Crea una cuenta</CardTitle>
           <CardDescription>
-            Ingresa tu correo para iniciar sesión en tu cuenta
+            Ingresa tus datos para empezar a aprender
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleRegister}>
             <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Nombre</Label>
+                <Input id="name" placeholder="Tu nombre" required />
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Correo electrónico</Label>
                 <Input
@@ -50,23 +52,21 @@ export default function LoginPage() {
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Contraseña</Label>
-                </div>
+                <Label htmlFor="password">Contraseña</Label>
                 <Input id="password" type="password" required />
               </div>
               <Button type="submit" className="w-full">
-                Iniciar Sesión
+                Crear Cuenta
               </Button>
               <Button variant="outline" className="w-full">
-                Iniciar Sesión con Google
+                Registrarse con Google
               </Button>
             </div>
           </form>
           <div className="mt-4 text-center text-sm">
-            ¿No tienes una cuenta?{" "}
-            <Link href="/register" className="underline">
-              Regístrate
+            ¿Ya tienes una cuenta?{" "}
+            <Link href="/" className="underline">
+              Inicia sesión
             </Link>
           </div>
         </CardContent>
