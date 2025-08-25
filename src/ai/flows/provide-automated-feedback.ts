@@ -37,17 +37,22 @@ export async function provideAutomatedFeedback(
   return provideAutomatedFeedbackFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'provideAutomatedFeedbackPrompt',
+const conversationalPrompt = ai.definePrompt({
+  name: 'conversationalPrompt',
+  input: {schema: ProvideAutomatedFeedbackInputSchema},
+  output: {schema: ProvideAutomatedFeedbackOutputSchema},
+  prompt: `You are acting as a conversational chatbot in Spanish. The user wants to practice their Spanish. Engage in a natural conversation with them.
+
+User's message: {{{answer}}}
+
+Respond naturally to continue the conversation. Your response should just be the text to continue the conversation. Provide the response in the 'feedback' field, and leave 'correctedAnswer' empty.`,
+});
+
+const feedbackPrompt = ai.definePrompt({
+  name: 'feedbackPrompt',
   input: {schema: ProvideAutomatedFeedbackInputSchema},
   output: {schema: ProvideAutomatedFeedbackOutputSchema},
   prompt: `You are an AI language tutor. Your response MUST be in Spanish.
-
-{{#ifCond question '==' 'Conversación abierta'}}
-You are acting as a conversational chatbot. The user wants to practice their Spanish. Engage in a natural conversation with them.
-User's message: {{{answer}}}
-Respond naturally to continue the conversation.
-{{else}}
 You are providing feedback to a student. The student is at level {{{level}}}.
 
 Question: {{{question}}}
@@ -56,10 +61,7 @@ Answer: {{{answer}}}
 Provide extensive and detailed feedback to the student, highlighting any errors and suggesting improvements. If the answer contains errors, provide a corrected answer as well.
 Be encouraging but thorough.
 Speak directly to the student in Spanish.
-Do not refer to yourself as an AI.
-Feedback:
-{{/ifCond}}
-`,
+Do not refer to yourself as an AI.`,
 });
 
 const provideAutomatedFeedbackFlow = ai.defineFlow(
@@ -69,16 +71,16 @@ const provideAutomatedFeedbackFlow = ai.defineFlow(
     outputSchema: ProvideAutomatedFeedbackOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    
-    // If it's open conversation, the corrected answer is the AI's response text.
-    if (input.question === 'Conversación abierta' && output) {
-        return {
-            correctedAnswer: output.correctedText,
-            feedback: output.feedback
-        };
+    if (input.question === 'Conversación abierta') {
+      const {output} = await conversationalPrompt(input);
+      // For conversational mode, the feedback is the response.
+      return {
+        feedback: output!.feedback,
+        correctedAnswer: output!.feedback, // The tutor page uses correctedAnswer for the AI's spoken response
+      };
+    } else {
+      const {output} = await feedbackPrompt(input);
+      return output!;
     }
-    
-    return output!;
   }
 );
