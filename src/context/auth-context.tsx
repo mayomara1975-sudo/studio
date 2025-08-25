@@ -46,11 +46,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(user);
       if (user) {
         try {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
+            const userDocRef = doc(db, "users", user.uid);
+            const userDoc = await getDoc(userDocRef);
             if (userDoc.exists()) {
               const data = userDoc.data();
               setUserLevel(data.level || null);
               setCompletedExercises(data.completedExercises || []);
+            } else {
+              // If the user is authenticated but the document doesn't exist, create it.
+              await createUserDocument(user);
+              setUserLevel(null);
+              setCompletedExercises([]);
             }
         } catch (error) {
             console.error("Error fetching user data:", error);
@@ -118,9 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const completeExercise = async (exerciseId: string) => {
     if (user && !completedExercises.includes(exerciseId)) {
       const userDocRef = doc(db, "users", user.uid);
-      await updateDoc(userDocRef, {
+      // Use setDoc with merge to create or update the document.
+      await setDoc(userDocRef, {
         completedExercises: arrayUnion(exerciseId)
-      });
+      }, { merge: true });
       setCompletedExercises(prev => [...prev, exerciseId]);
     }
   };
