@@ -19,6 +19,15 @@ import { db } from "@/lib/firebase";
 type QuizState = "loading" | "ongoing" | "finished";
 type AnswerStatus = "unanswered" | "correct" | "incorrect";
 
+interface UserAnswer {
+    question: string;
+    options: string[];
+    selectedAnswer: string;
+    correctAnswer: string;
+    isCorrect: boolean;
+    feedback: string;
+}
+
 export function QuizClient() {
   const { user, updateUserLevel } = useAuth();
   const [quizState, setQuizState] = useState<QuizState>("loading");
@@ -26,7 +35,7 @@ export function QuizClient() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>("unanswered");
-  const [userAnswers, setUserAnswers] = useState<{question: string, answer: string, isCorrect: boolean}[]>([]);
+  const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [proficiencyResult, setProficiencyResult] = useState<AnalyzeProficiencyLevelOutput | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,7 +64,14 @@ export function QuizClient() {
     
     const isCorrect = selectedAnswer === currentQuestion.answer;
     setAnswerStatus(isCorrect ? "correct" : "incorrect");
-    setUserAnswers([...userAnswers, { question: currentQuestion.question, answer: selectedAnswer, isCorrect }]);
+    setUserAnswers([...userAnswers, { 
+        question: currentQuestion.question, 
+        options: currentQuestion.options,
+        selectedAnswer: selectedAnswer,
+        correctAnswer: currentQuestion.answer,
+        isCorrect,
+        feedback: currentQuestion.feedback
+    }]);
   };
 
   const handleNextQuestion = async () => {
@@ -68,7 +84,7 @@ export function QuizClient() {
       setQuizState("finished");
       setIsSubmitting(true);
       try {
-        const quizResponses = userAnswers.map(ua => `P: ${ua.question}\nR: ${ua.answer}`).join("\n---\n");
+        const quizResponses = userAnswers.map(ua => `Pregunta: ${ua.question}\nRespuesta del usuario: ${ua.selectedAnswer} (Correcta: ${ua.correctAnswer})`).join("\n---\n");
         const result = await analyzeProficiencyLevel({ quizResponses: quizResponses });
         setProficiencyResult(result);
         if(user && result.proficiencyLevel) {
@@ -91,44 +107,44 @@ export function QuizClient() {
 
   if (quizState === "loading" || !currentQuestion) {
     return (
-        <Card className="mt-4">
+        <Card className="mt-4 shadow-xl border-none">
             <CardHeader><Skeleton className="h-6 w-3/5" /></CardHeader>
             <CardContent className="p-6 space-y-4">
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
-                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
             </CardContent>
-            <CardFooter><Skeleton className="h-10 w-full" /></CardFooter>
+            <CardFooter><Skeleton className="h-12 w-full" /></CardFooter>
         </Card>
     );
   }
 
   if (quizState === "finished") {
     return (
-      <Card className="mt-4 shadow-lg">
-        <CardHeader className="text-center">
+      <Card className="mt-4 shadow-lg border-none">
+        <CardHeader className="text-center items-center">
           <Award className="w-16 h-16 text-primary mx-auto" />
-          <CardTitle className="text-2xl font-headline mt-2">¡Prueba Completada!</CardTitle>
-          <CardDescription>Aquí están tus resultados.</CardDescription>
+          <CardTitle className="text-3xl font-headline mt-2">¡Prueba Completada!</CardTitle>
+          <CardDescription>Estos son tus resultados. ¡Excelente trabajo!</CardDescription>
         </CardHeader>
         <CardContent>
           {isSubmitting ? (
             <div className="flex flex-col items-center gap-4 p-8">
-              <p className="font-semibold">Analizando tus respuestas...</p>
-              <Skeleton className="w-24 h-24 rounded-full" />
-              <Skeleton className="h-6 w-3/4 mt-2" />
+              <p className="font-semibold text-lg">Analizando tus respuestas...</p>
+              <Skeleton className="w-32 h-32 rounded-full" />
+              <Skeleton className="h-8 w-4/5 mt-4" />
             </div>
           ) : proficiencyResult ? (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="text-center p-6 bg-primary/10 rounded-lg border border-primary/20">
                 <p className="text-sm text-primary font-semibold tracking-wider uppercase">Tu Nivel de Proficiencia</p>
-                <p className="text-6xl font-bold font-headline text-primary">{proficiencyResult.proficiencyLevel}</p>
+                <p className="text-7xl font-bold font-headline text-primary">{proficiencyResult.proficiencyLevel}</p>
               </div>
               <Alert>
                 <Lightbulb className="h-4 w-4" />
-                <AlertTitle className="font-headline">Justificación de la IA</AlertTitle>
-                <AlertDescription>{proficiencyResult.reasoning}</AlertDescription>
+                <AlertTitle className="font-headline text-lg">Análisis de la IA</AlertTitle>
+                <AlertDescription className="text-base whitespace-pre-wrap">{proficiencyResult.reasoning}</AlertDescription>
               </Alert>
             </div>
           ) : <p className="text-center text-destructive">Hubo un error al analizar tus resultados.</p>}
@@ -139,42 +155,49 @@ export function QuizClient() {
 
   return (
     <div className="mt-4">
-        <div className="flex items-center gap-4 mb-2">
-            <Progress value={progress} className="flex-1" />
-            <span className="text-sm text-muted-foreground">{currentQuestionIndex + 1} / {questions.length}</span>
+        <div className="flex items-center gap-4 mb-4">
+            <Progress value={progress} className="flex-1 h-3" />
+            <span className="text-sm font-semibold text-muted-foreground">{currentQuestionIndex + 1} / {questions.length}</span>
         </div>
-        <Card className="shadow-lg">
+        <Card className="shadow-xl border-none">
             <CardHeader>
-            <CardTitle className="font-headline">Pregunta {currentQuestionIndex + 1}</CardTitle>
-            <CardDescription className="text-lg pt-2">{currentQuestion.question}</CardDescription>
+            <CardTitle className="font-headline text-2xl">Pregunta {currentQuestionIndex + 1}</CardTitle>
+            <CardDescription className="text-xl pt-2 text-foreground">{currentQuestion.question}</CardDescription>
             </CardHeader>
             <CardContent>
             <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer ?? ''} disabled={answerStatus !== 'unanswered'}>
+                <div className="space-y-3">
                 {currentQuestion.options.map((option, index) => (
-                <Label key={index} htmlFor={`option-${index}`} className={cn("flex items-center space-x-3 p-4 rounded-md border transition-all cursor-pointer", selectedAnswer === option && "border-primary bg-primary/10")}>
-                    <RadioGroupItem value={option} id={`option-${index}`} />
-                    <span className="flex-1">{option}</span>
-                </Label>
+                    <Label key={index} htmlFor={`option-${index}`} 
+                        className={cn("flex items-center space-x-4 p-4 rounded-lg border-2 transition-all cursor-pointer text-base hover:border-primary", 
+                        selectedAnswer === option && "border-primary bg-primary/10 ring-2 ring-primary",
+                        answerStatus !== 'unanswered' && option === currentQuestion.answer && "border-green-500 bg-green-500/10",
+                        answerStatus === 'incorrect' && selectedAnswer === option && "border-destructive bg-destructive/10"
+                        )}>
+                        <RadioGroupItem value={option} id={`option-${index}`} className="h-5 w-5"/>
+                        <span className="flex-1">{option}</span>
+                    </Label>
                 ))}
+                </div>
             </RadioGroup>
             </CardContent>
             <CardFooter className="flex-col gap-4">
               {answerStatus === 'unanswered' ? (
-                  <Button onClick={handleSubmitAnswer} disabled={!selectedAnswer} className="w-full">
-                  Comprobar
+                  <Button onClick={handleSubmitAnswer} disabled={!selectedAnswer} className="w-full h-12 text-lg">
+                    Comprobar
                   </Button>
               ) : (
-                  <Button onClick={handleNextQuestion} className="w-full">
+                  <Button onClick={handleNextQuestion} className="w-full h-12 text-lg">
                   {currentQuestionIndex < questions.length - 1 ? "Siguiente Pregunta" : "Finalizar Prueba"}
                   </Button>
               )}
                {answerStatus !== 'unanswered' && (
-                <Alert variant={answerStatus === 'correct' ? 'default' : 'destructive'} className="w-full">
-                    {answerStatus === 'correct' ? <ThumbsUp className="h-4 w-4" /> : <ThumbsDown className="h-4 w-4" />}
-                    <AlertTitle>{answerStatus === 'correct' ? '¡Correcto!' : 'Incorrecto'}</AlertTitle>
-                    <AlertDescription>
+                <Alert variant={answerStatus === 'correct' ? 'default' : 'destructive'} className="w-full border-2">
+                    {answerStatus === 'correct' ? <ThumbsUp className="h-5 w-5" /> : <ThumbsDown className="h-5 w-5" />}
+                    <AlertTitle className="text-lg">{answerStatus === 'correct' ? '¡Correcto!' : 'Incorrecto'}</AlertTitle>
+                    <AlertDescription className="text-base">
                         {currentQuestion.feedback}
-                        {answerStatus === 'incorrect' && ` La respuesta correcta es: ${currentQuestion.answer}`}
+                        {answerStatus === 'incorrect' && ` La respuesta correcta es: **${currentQuestion.answer}**`}
                     </AlertDescription>
                 </Alert>
               )}

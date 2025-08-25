@@ -21,11 +21,11 @@ export type ProvideAutomatedFeedbackInput = z.infer<
 >;
 
 const ProvideAutomatedFeedbackOutputSchema = z.object({
-  feedback: z.string().describe('AI-generated feedback on the user\'s answer.'),
+  feedback: z.string().describe('AI-generated feedback on the user\'s answer. Must be extensive and in Spanish.'),
   correctedAnswer: z
     .string()
     .optional()
-    .describe('The corrected version of the user\'s answer, if applicable.'),
+    .describe('The corrected version of the user\'s answer, if applicable. Must be in Spanish.'),
 });
 export type ProvideAutomatedFeedbackOutput = z.infer<
   typeof ProvideAutomatedFeedbackOutputSchema
@@ -41,15 +41,15 @@ const prompt = ai.definePrompt({
   name: 'provideAutomatedFeedbackPrompt',
   input: {schema: ProvideAutomatedFeedbackInputSchema},
   output: {schema: ProvideAutomatedFeedbackOutputSchema},
-  prompt: `You are an AI language tutor providing feedback to a student. The student is at level {{{level}}}.
+  prompt: `You are an AI language tutor providing feedback to a student. The student is at level {{{level}}}. Your response MUST be in Spanish.
 
   Question: {{{question}}}
   Answer: {{{answer}}}
 
-  Provide feedback to the student, highlighting any errors and suggesting improvements. If the answer contains errors, provide a corrected answer as well.
-  Be concise and encouraging.
-  Speak directly to the student.
-  Do not refer to yourself.
+  Provide extensive and detailed feedback to the student, highlighting any errors and suggesting improvements. If the answer contains errors, provide a corrected answer as well.
+  Be encouraging but thorough.
+  Speak directly to the student in Spanish.
+  Do not refer to yourself as an AI.
   Feedback:
   `,
 });

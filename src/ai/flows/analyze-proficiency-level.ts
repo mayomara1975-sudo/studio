@@ -29,7 +29,7 @@ const AnalyzeProficiencyLevelOutputSchema = z.object({
   reasoning: z
     .string()
     .describe(
-      'The AI reasoning behind the assessed proficiency level, explaining why the user was assigned that level based on their performance.'
+      'The AI reasoning behind the assessed proficiency level, explaining why the user was assigned that level based on their performance. Must be extensive and in Spanish.'
     ),
 });
 export type AnalyzeProficiencyLevelOutput = z.infer<
@@ -46,11 +46,13 @@ const prompt = ai.definePrompt({
   name: 'analyzeProficiencyLevelPrompt',
   input: {schema: AnalyzeProficiencyLevelInputSchema},
   output: {schema: AnalyzeProficiencyLevelOutputSchema},
-  prompt: `You are an expert language proficiency assessor.
+  prompt: `You are an expert language proficiency assessor. Your response MUST be in Spanish.
 
 You will analyze the user's quiz responses to determine their language proficiency level according to the Common European Framework of Reference for Languages (CEFR). The levels are A1, A2, B1, B2, C1, and C2.
 
-Analyze the user's answers, considering grammar, vocabulary, and comprehension. Based on their performance, determine the most appropriate proficiency level and provide a concise, clear explanation for your assessment.
+Analyze the user's answers, considering grammar, vocabulary, and comprehension. Based on their performance, determine the most appropriate proficiency level. A user who answers everything correctly should be rated C2.
+
+Provide a detailed, extensive, and clear explanation for your assessment, written in Spanish.
 
 Quiz Responses:
 {{{quizResponses}}}

@@ -22,7 +22,7 @@ const GenerateQuizQuestionsInputSchema = z.object({
     ),
   numberOfQuestions: z
     .number()
-    .default(5)
+    .default(15)
     .describe('The number of questions to generate for the quiz.'),
 });
 export type GenerateQuizQuestionsInput = z.infer<typeof GenerateQuizQuestionsInputSchema>;
@@ -33,7 +33,7 @@ const GenerateQuizQuestionsOutputSchema = z.object({
       question: z.string().describe('The quiz question.'),
       answer: z.string().describe('The correct answer to the question.'),
       options: z.array(z.string()).describe('The possible answer options.'),
-      feedback: z.string().describe('Brief, encouraging feedback for the user response.'),
+      feedback: z.string().describe('Brief, encouraging feedback for the user response, always in Spanish.'),
     })
   ),
 });
@@ -47,9 +47,9 @@ const prompt = ai.definePrompt({
   name: 'generateQuizQuestionsPrompt',
   input: {schema: GenerateQuizQuestionsInputSchema},
   output: {schema: GenerateQuizQuestionsOutputSchema},
-  prompt: `You are an AI quiz generator specializing in Spanish language learning. Create a set of multiple-choice questions to assess a user's proficiency. The questions should cover a range of difficulties from A1 (beginner) to C2 (proficient) to accurately determine their level.
+  prompt: `You are an AI quiz generator specializing in Spanish language learning. Create a set of multiple-choice questions to assess a user's proficiency. The questions should cover a wide range of difficulties from A1 (beginner) to C2 (proficient) to accurately determine their level.
 
-Ensure the questions test various aspects of the language, including grammar (verb tenses, ser vs. estar, prepositions), vocabulary, and reading comprehension.
+Ensure the questions test various aspects of the language, including grammar (verb tenses, ser vs. estar, prepositions, subjunctive), advanced vocabulary, and reading comprehension of complex texts. The difficulty must be varied, with some easy questions and some very challenging ones.
 
 Topic: {{{topic}}}
 Target Proficiency Range: {{{proficiencyLevel}}}
@@ -60,6 +60,8 @@ For each question, provide:
 2. The correct answer.
 3. Plausible incorrect options.
 4. Brief, encouraging feedback for when a user selects an answer.
+
+IMPORTANT: All output text, including questions, answers, options, and feedback, MUST be in Spanish.
 
 Generate the quiz in JSON format.`,
 });
