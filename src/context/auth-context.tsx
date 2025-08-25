@@ -18,7 +18,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 
 interface AuthContextType {
   user: User | null;
@@ -29,6 +29,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   userLevel: string | null;
   updateUserLevel: (level: string) => void;
+  completedExercises: string[];
+  completeExercise: (exerciseId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [userLevel, setUserLevel] = useState<string | null>(null);
+  const [completedExercises, setCompletedExercises] = useState<string[]>([]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -45,14 +48,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
             const userDoc = await getDoc(doc(db, "users", user.uid));
             if (userDoc.exists()) {
-              setUserLevel(userDoc.data().level || null);
+              const data = userDoc.data();
+              setUserLevel(data.level || null);
+              setCompletedExercises(data.completedExercises || []);
             }
         } catch (error) {
-            console.error("Error fetching user level:", error);
+            console.error("Error fetching user data:", error);
             setUserLevel(null);
+            setCompletedExercises([]);
         }
       } else {
         setUserLevel(null);
+        setCompletedExercises([]);
       }
       setLoading(false);
     });
@@ -72,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName,
         photoURL,
         createdAt,
+        completedExercises: [],
         ...additionalData,
       });
     }
@@ -107,8 +115,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const completeExercise = async (exerciseId: string) => {
+    if (user && !completedExercises.includes(exerciseId)) {
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, {
+        completedExercises: arrayUnion(exerciseId)
+      });
+      setCompletedExercises(prev => [...prev, exerciseId]);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signUpWithEmail, signInWithEmail, signInWithGoogle, logout, userLevel, updateUserLevel }}>
+    <AuthContext.Provider value={{ user, loading, signUpWithEmail, signInWithEmail, signInWithGoogle, logout, userLevel, updateUserLevel, completedExercises, completeExercise }}>
       {children}
     </AuthContext.Provider>
   );

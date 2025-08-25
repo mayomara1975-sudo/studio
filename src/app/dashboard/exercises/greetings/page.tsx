@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -66,8 +66,10 @@ type FeedbackState = {
     corrected: string | null;
 } | null;
 
+const exerciseId = "greetings";
+
 export default function GreetingsLessonPage() {
-    const { userLevel } = useAuth();
+    const { userLevel, completeExercise } = useAuth();
     const router = useRouter();
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     const [responses, setResponses] = useState<{[key: number]: string}>({});
@@ -77,6 +79,12 @@ export default function GreetingsLessonPage() {
     const currentPart = lessonParts[currentPartIndex];
     const progress = ((currentPartIndex + 1) / lessonParts.length) * 100;
     const isFinalStep = currentPartIndex === lessonParts.length - 1;
+
+    useEffect(() => {
+        if (isFinalStep) {
+            completeExercise(exerciseId);
+        }
+    }, [isFinalStep, completeExercise]);
 
     const handleResponseChange = (index: number, value: string) => {
         setResponses(prev => ({...prev, [index]: value}));
@@ -133,6 +141,11 @@ export default function GreetingsLessonPage() {
         }
     };
 
+    const formatText = (text: string) => {
+        const boldedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        return <span dangerouslySetInnerHTML={{ __html: boldedText }} />;
+    };
+
     const renderPart = () => {
         switch (currentPart.type) {
             case 'intro':
@@ -149,7 +162,7 @@ export default function GreetingsLessonPage() {
                         <p className="text-muted-foreground mb-4">{currentPart.content}</p>
                         <div className="space-y-3">
                             {(currentPart as any).examples.map((ex: string, i: number) => (
-                                <p key={i} className="p-3 bg-muted rounded-md" dangerouslySetInnerHTML={{__html: ex}} />
+                                <p key={i} className="p-3 bg-muted rounded-md">{formatText(ex)}</p>
                             ))}
                         </div>
                     </div>
@@ -220,8 +233,8 @@ export default function GreetingsLessonPage() {
                 <Button variant="outline" onClick={goToPreviousPart} disabled={currentPartIndex === 0}>
                     <ArrowLeft className="mr-2"/> Anterior
                 </Button>
-                 <Button onClick={goToNextPart}>
-                    {isFinalStep ? 'Finalizar' : 'Siguiente'} <ArrowRight className="ml-2"/>
+                 <Button onClick={goToNextPart} disabled={currentPart.type === 'exercise' && !feedbacks[currentPartIndex]}>
+                    {isFinalStep ? 'Finalizar y Volver' : 'Siguiente'} <ArrowRight className="ml-2"/>
                 </Button>
             </CardFooter>
         </Card>
