@@ -1,19 +1,23 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import Link from "next/link";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { BookOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 export default function LessonsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline flex items-center gap-2"><BookOpen /> Lecciones Interactivas</h1>
+        <h1 className="text-3xl font-bold font-headline flex items-center gap-2"><BookOpen /> Lección: Ser vs. Estar</h1>
         <p className="text-muted-foreground">Aprende gramática y vocabulario de forma dinámica.</p>
       </div>
 
       <Card className="shadow-lg">
         <CardHeader>
-          <Badge variant="secondary" className="w-fit mb-2">Gramática A1/A2</Badge>
+          <Badge variant="secondary" className="w-fit mb-2">Gramática A2</Badge>
           <CardTitle className="text-2xl font-headline">Ser vs. Estar</CardTitle>
           <CardDescription>Una de las dudas más comunes para los estudiantes de español.</CardDescription>
         </CardHeader>
@@ -27,7 +31,7 @@ export default function LessonsPage() {
           <div>
             <h3 className="font-bold text-lg font-headline mb-2">Cuándo usar "Ser"</h3>
             <p className="text-muted-foreground mb-4">
-              Usamos <strong>Ser</strong> para hablar de características inherentes, permanentes o que definen a alguien o algo.
+              Usamos <strong>Ser</strong> para hablar de características inherentes, permanentes o que definen a alguien o algo. Es la esencia.
             </p>
             <ul className="list-disc pl-5 space-y-2">
               <li><strong>Identidad y descripción:</strong> <em>Yo <strong>soy</strong> profesor. Ella <strong>es</strong> alta e inteligente.</em></li>
@@ -43,7 +47,7 @@ export default function LessonsPage() {
           <div>
             <h3 className="font-bold text-lg font-headline mb-2">Cuándo usar "Estar"</h3>
             <p className="text-muted-foreground mb-4">
-              Usamos <strong>Estar</strong> para hablar de estados temporales, localizaciones y condiciones.
+              Usamos <strong>Estar</strong> para hablar de estados temporales, localizaciones y condiciones. Es el estado.
             </p>
             <ul className="list-disc pl-5 space-y-2">
               <li><strong>Localización:</strong> <em>El libro <strong>está</strong> en la mesa. Madrid <strong>está</strong> en España.</em></li>
@@ -53,6 +57,11 @@ export default function LessonsPage() {
             </ul>
           </div>
         </CardContent>
+         <CardFooter>
+            <Button asChild>
+                <Link href="/dashboard/exercises">Iniciar los ejercicios</Link>
+            </Button>
+        </CardFooter>
       </Card>
     </div>
   );

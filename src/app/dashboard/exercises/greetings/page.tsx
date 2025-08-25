@@ -69,7 +69,7 @@ type FeedbackState = {
 const exerciseId = "greetings";
 
 export default function GreetingsLessonPage() {
-    const { userLevel, completeExercise } = useAuth();
+    const { user, completeExercise } = useAuth();
     const router = useRouter();
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     const [responses, setResponses] = useState<{[key: number]: string}>({});
@@ -80,18 +80,19 @@ export default function GreetingsLessonPage() {
     const progress = ((currentPartIndex + 1) / lessonParts.length) * 100;
     const isFinalStep = currentPartIndex === lessonParts.length - 1;
 
-    useEffect(() => {
-        if (isFinalStep) {
-            completeExercise(exerciseId);
+    const handleCompleteExercise = async () => {
+        if(user){
+            await completeExercise(exerciseId);
+            router.push('/dashboard/exercises');
         }
-    }, [isFinalStep, completeExercise]);
+    };
 
     const handleResponseChange = (index: number, value: string) => {
         setResponses(prev => ({...prev, [index]: value}));
     };
 
     const checkAnswer = async (index: number) => {
-        if (!responses[index]) return;
+        if (!responses[index] || !user) return;
 
         setLoading(prev => ({...prev, [index]: true}));
         
@@ -99,7 +100,7 @@ export default function GreetingsLessonPage() {
             const result = await provideAutomatedFeedback({
                 answer: responses[index],
                 question: (lessonParts[index] as any).question,
-                level: userLevel || 'A1'
+                level: user.providerData[0]?.uid || 'A1'
             });
 
             setFeedbacks(prev => ({
@@ -127,7 +128,7 @@ export default function GreetingsLessonPage() {
     
     const goToNextPart = () => {
         if (isFinalStep) {
-            router.push('/dashboard/exercises');
+            handleCompleteExercise();
             return;
         }
         if (currentPartIndex < lessonParts.length - 1) {
