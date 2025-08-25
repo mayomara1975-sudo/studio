@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -67,6 +68,7 @@ type FeedbackState = {
 
 export default function GreetingsLessonPage() {
     const { userLevel } = useAuth();
+    const router = useRouter();
     const [currentPartIndex, setCurrentPartIndex] = useState(0);
     const [responses, setResponses] = useState<{[key: number]: string}>({});
     const [feedbacks, setFeedbacks] = useState<{[key: number]: FeedbackState}>({});
@@ -74,6 +76,7 @@ export default function GreetingsLessonPage() {
 
     const currentPart = lessonParts[currentPartIndex];
     const progress = ((currentPartIndex + 1) / lessonParts.length) * 100;
+    const isFinalStep = currentPartIndex === lessonParts.length - 1;
 
     const handleResponseChange = (index: number, value: string) => {
         setResponses(prev => ({...prev, [index]: value}));
@@ -115,6 +118,10 @@ export default function GreetingsLessonPage() {
     };
     
     const goToNextPart = () => {
+        if (isFinalStep) {
+            router.push('/dashboard/exercises');
+            return;
+        }
         if (currentPartIndex < lessonParts.length - 1) {
             setCurrentPartIndex(currentPartIndex + 1);
         }
@@ -213,8 +220,8 @@ export default function GreetingsLessonPage() {
                 <Button variant="outline" onClick={goToPreviousPart} disabled={currentPartIndex === 0}>
                     <ArrowLeft className="mr-2"/> Anterior
                 </Button>
-                 <Button onClick={goToNextPart} disabled={currentPartIndex === lessonParts.length - 1}>
-                    Siguiente <ArrowRight className="ml-2"/>
+                 <Button onClick={goToNextPart}>
+                    {isFinalStep ? 'Finalizar' : 'Siguiente'} <ArrowRight className="ml-2"/>
                 </Button>
             </CardFooter>
         </Card>
