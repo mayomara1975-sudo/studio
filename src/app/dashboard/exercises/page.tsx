@@ -6,10 +6,10 @@ import { Badge } from '@/components/ui/badge';
 
 const exercises = [
   {
-    title: "Saludos y Despedidas",
-    description: "Practica cómo saludar y despedirte en situaciones formales e informales.",
+    title: "Saludos y Presentaciones",
+    description: "Practica cómo saludar y presentarte en situaciones formales e informales.",
     level: "A1",
-    href: "#" 
+    href: "/dashboard/exercises/greetings"
   }
 ];
 
@@ -32,7 +32,7 @@ export default function ExercisesPage() {
               
             </CardContent>
             <CardFooter>
-              <Button asChild className="w-full" disabled>
+              <Button asChild className="w-full">
                 <Link href={exercise.href}>
                   Empezar Ejercicio <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

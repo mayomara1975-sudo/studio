@@ -12,17 +12,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ThumbsUp, ThumbsDown, Award, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/auth-context";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 type QuizState = "loading" | "ongoing" | "finished";
 type AnswerStatus = "unanswered" | "correct" | "incorrect";
 
 export function QuizClient() {
+  const { user, updateUserLevel } = useAuth();
   const [quizState, setQuizState] = useState<QuizState>("loading");
   const [questions, setQuestions] = useState<GenerateQuizQuestionsOutput["questions"]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [answerStatus, setAnswerStatus] = useState<AnswerStatus>("unanswered");
-  const [userAnswers, setUserAnswers] = useState<string[]>([]);
+  const [userAnswers, setUserAnswers] = useState<{question: string, answer: string, isCorrect: boolean}[]>([]);
   const [proficiencyResult, setProficiencyResult] = useState<AnalyzeProficiencyLevelOutput | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,7 +55,7 @@ export function QuizClient() {
     
     const isCorrect = selectedAnswer === currentQuestion.answer;
     setAnswerStatus(isCorrect ? "correct" : "incorrect");
-    setUserAnswers([...userAnswers, `Q: ${currentQuestion.question}\nA: ${selectedAnswer}`]);
+    setUserAnswers([...userAnswers, { question: currentQuestion.question, answer: selectedAnswer, isCorrect }]);
   };
 
   const handleNextQuestion = async () => {
@@ -64,8 +68,19 @@ export function QuizClient() {
       setQuizState("finished");
       setIsSubmitting(true);
       try {
-        const result = await analyzeProficiencyLevel({ quizResponses: userAnswers.join("\n---\n") });
+        const quizResponses = userAnswers.map(ua => `P: ${ua.question}\nR: ${ua.answer}`).join("\n---\n");
+        const result = await analyzeProficiencyLevel({ quizResponses: quizResponses });
         setProficiencyResult(result);
+        if(user && result.proficiencyLevel) {
+            updateUserLevel(result.proficiencyLevel);
+            const quizResultRef = doc(db, `users/${user.uid}/quizHistory`, new Date().toISOString());
+            await setDoc(quizResultRef, {
+                level: result.proficiencyLevel,
+                reasoning: result.reasoning,
+                responses: userAnswers,
+                completedAt: new Date()
+            });
+        }
       } catch (error) {
         console.error("Failed to analyze proficiency:", error);
       } finally {

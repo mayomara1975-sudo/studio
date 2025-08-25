@@ -9,6 +9,7 @@ import {
   SidebarInset,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
+import { AuthGuard } from "@/components/auth-guard";
 
 export default function DashboardLayout({
   children,
@@ -16,6 +17,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
+   <AuthGuard>
     <SidebarProvider>
       <Sidebar collapsible="icon">
         <SidebarHeader>
@@ -39,5 +41,6 @@ export default function DashboardLayout({
         </main>
       </SidebarInset>
     </SidebarProvider>
+   </AuthGuard>
   );
 }

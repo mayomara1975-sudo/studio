@@ -13,14 +13,53 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/logo";
+import { useState } from "react";
+import { useAuth } from "@/context/auth-context";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { signUpWithEmail, signInWithGoogle } = useAuth();
+  const { toast } = useToast();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  const handleRegister = (e: React.FormEvent) => {
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock register
-    router.push("/dashboard");
+    setIsLoading(true);
+    try {
+      await signUpWithEmail(email, password, name);
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Error al registrarse",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      router.push("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Error con Google",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -40,7 +79,7 @@ export default function RegisterPage() {
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Nombre</Label>
-                <Input id="name" placeholder="Tu nombre" required />
+                <Input id="name" placeholder="Tu nombre" required value={name} onChange={(e) => setName(e.target.value)} disabled={isLoading} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Correo electrónico</Label>
@@ -49,16 +88,21 @@ export default function RegisterPage() {
                   type="email"
                   placeholder="nombre@ejemplo.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
                 />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input id="password" type="password" required />
+                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} disabled={isLoading} />
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Crear Cuenta
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={isGoogleLoading}>
+                 {isGoogleLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Registrarse con Google
               </Button>
             </div>

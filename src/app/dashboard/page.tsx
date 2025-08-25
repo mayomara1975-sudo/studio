@@ -1,7 +1,10 @@
+"use client";
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { ArrowRight, Book, CheckSquare, PenSquare, TestTube2 } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
 
 const features = [
   {
@@ -35,24 +38,28 @@ const features = [
 ];
 
 export default function DashboardPage() {
+  const { user, userLevel } = useAuth();
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline">¡Hola, bienvenido a Profemar!</h1>
+        <h1 className="text-3xl font-bold font-headline">¡Hola, bienvenido a Profemar, {user?.displayName?.split(' ')[0] || 'estudiante'}!</h1>
         <p className="text-muted-foreground">Aquí tienes un resumen de tu progreso y las actividades disponibles.</p>
       </div>
 
       <Card className="bg-primary/10 border-primary shadow-lg">
         <CardHeader>
           <CardTitle>Tu Nivel Actual</CardTitle>
-          <CardDescription>Completa la prueba de nivel para empezar tu aventura de aprendizaje.</CardDescription>
+          <CardDescription>
+            {userLevel ? `Basado en tu última prueba, tu nivel es ${userLevel}. ¡Sigue practicando!` : "Completa la prueba de nivel para empezar tu aventura de aprendizaje."}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <div className="text-4xl font-bold text-primary">--</div>
+            <div className="text-4xl font-bold text-primary">{userLevel || "--"}</div>
             <Button asChild>
               <Link href="/dashboard/quiz">
-                Hacer la prueba <ArrowRight className="ml-2 h-4 w-4" />
+                {userLevel ? "Repetir prueba" : "Hacer la prueba"} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
