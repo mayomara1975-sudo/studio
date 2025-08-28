@@ -1,28 +1,80 @@
-# ProfeMar: Tabla de contenidos
--Descripción
--Modelo usado
--Precio
--Contribuidor
--Próximas Actualizaciones
+# 🚀✨ ProfeMar: ¡El futuro del aprendizaje de idiomas ya está aquí! 🌍🧠
 
-## 1.Descripción
+---
 
-"Deja de usar plataformas de idiomas que siempre te ponen las mismas preguntas."
+<div align="center">
+  <h2>¡Bienvenido/a a la revolución del aprendizaje!</h2>
+  <strong>Personalización, innovación y diversión, ¡todo en una sola plataforma!</strong>
+</div>
 
-ProfeMar es una plataforma con IA generativa que te a aprender idiomas a velocidad de vértigo.
+---
 
-## 2. Modelo usado
+## 📚 Índice
 
-**ProfeMar** usa Gemini 3.0-Beta-Experimental Fine-Tuned con PyTorch, una IA que solo pueden usar los registrados en ProfeMar
+- [¿Qué es ProfeMar?](#1-qué-es-profemar)
+- [🤖 Tecnología y Modelo](#2-tecnología-y-modelo)
+- [💸 Precios y Acceso](#3-precios-y-acceso)
+- [🤝 Cómo Contribuir](#4-cómo-contribuir)
+- [🔮 Próximas Novedades](#5-próximas-novedades)
 
-## 3. Precio
+---
 
-Actualmente es gratis, pero se impondrá un plan de pago alrededor de octubre a **5€ el mes el plan Pro** y el plan gratuito seguirá siendo gratuito
+## 1. ¿Qué es ProfeMar?
 
-## 4. Contribuidor
+<blockquote>
+  “¡Olvida las plataformas aburridas! Aquí, cada día es una aventura nueva.”
+</blockquote>
 
-Contribuye al proyecto open-source!
+**ProfeMar** es mucho más que una app para aprender idiomas:
+- 🎯 Aprendizaje hiper-personalizado y dinámico.
+- 🧩 Ejercicios únicos que jamás se repiten.
+- 💡 IA que te entiende y te reta cada vez más.
 
-## 5.Próximas actualizaciones
+¡Aprender nunca había sido tan rápido, eficiente y divertido! Únete y haz del idioma tu superpoder. 💥
 
-26/08/2025: ProfeMar empieza a estar disponible en beta
+---
+
+## 2. Tecnología y Modelo
+
+- ⚡ **IA de última generación:** Gemini 3.0-Beta-Experimental Fine-Tuned con PyTorch.
+- 🔒 **Exclusividad:** Solo usuarios registrados disfrutan de una IA que nunca repite preguntas y se adapta a tu evolución.
+- 🌈 **Innovación:** Ejercicios originales, feedback inteligente y desafíos únicos cada día.
+
+---
+
+## 3. Precios y Acceso
+
+- 🎁 **Acceso Actual:** ¡100% GRATIS para todos!
+- 🏆 **Plan Pro** (próximamente, octubre 2025): solo **5 €/mes** — desbloquea funciones premium, acceso ilimitado y sorpresas exclusivas.
+- 🆓 **Plan Gratuito:** siempre disponible, con acceso básico pero divertido.
+
+> 🚨 **Aprovéchalo ahora y sé de los primeros en probar la beta exclusiva!**
+
+---
+
+## 4. Cómo Contribuir
+
+¿Te apasiona la educación, la IA o simplemente quieres dejar huella en una comunidad genial? ¡Este es tu sitio!
+
+- Haz un fork y comienza a aportar ideas o código.
+- ¿Bugs? ¿Ideas? ¡Abre un _issue_!
+- ¿Tienes algo grande en mente? Envíanos un _pull request_.
+- Únete a la conversación y crezcamos juntos.  
+¡Cada aportación cuenta y será reconocida! 🥳
+
+---
+
+## 5. Próximas Novedades
+
+- **26/08/2025:** ¡Lanzamiento de la beta de ProfeMar! 🚀
+- 🎯 Nuevos idiomas y retos gamificados.
+- 🤝 Comunidad integrada y rankings.
+- 📲 App móvil en desarrollo.
+- Y mucho, mucho más… ¡Súmate y ayúdanos a construir el futuro del aprendizaje de idiomas!
+
+---
+
+## 💬 ¿Tienes dudas? ¿Ideas? ¿Quieres formar parte de esto?
+
+¡No lo pienses! Abre un _issue_ o contáctanos y forma parte de la comunidad más innovadora y divertida del aprendizaje de idiomas.
+**¡ProfeMar es tuyo, mío, nuestro… y de todo el mundo!** 🌐💙
